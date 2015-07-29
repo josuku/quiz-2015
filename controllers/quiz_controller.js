@@ -17,9 +17,19 @@ exports.load = function(req, res, next, quizId){
 
 // GET /quizes
 exports.index = function(req, res){
-	models.Quiz.findAll().then(function(quizes){
-		res.render('quizes/index.ejs', { quizes: quizes, errors: [] });
-	}).catch(function(error) { next(error); })
+	if (req.query.search)
+	{
+		var search = "%" + req.query.search.replace(/ /g,"%") + "%";
+		models.Quiz.findAll({where: ["pregunta like ?", search]}).then(function(quizes){
+			res.render('quizes/index.ejs', { quizes: quizes, errors: [] });
+		});
+	}
+	else
+	{
+		models.Quiz.findAll().then(function(quizes){
+			res.render('quizes/index.ejs', { quizes: quizes, errors: [] });
+		}).catch(function(error) { next(error); });
+	}
 };
 
 
@@ -92,6 +102,14 @@ exports.update = function(req, res) {
 
 // DELETE /quizes/:id
 exports.destroy = function(req, res) {
+	req.quiz.destroy().then(function(){
+		res.redirect('/quizes');
+	}).catch(function(error){ next(error); });
+};
+
+
+// DELETE /quizes?search=text
+exports.search = function(req, res) {
 	req.quiz.destroy().then(function(){
 		res.redirect('/quizes');
 	}).catch(function(error){ next(error); });
