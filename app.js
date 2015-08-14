@@ -49,6 +49,7 @@ app.use(function(req, res, next) {
         if (tiempoSinActividad > 120000)
         {
             delete req.session.user;
+            delete req.session.hora;
         }
         else
         {
