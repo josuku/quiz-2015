@@ -38,6 +38,27 @@ app.use(function(req, res, next) {
     next();
 });
 
+// Auto-logout
+app.use(function(req, res, next) {
+
+    if (req.session && req.session.user)
+    {
+        var horaActual = new Date().getTime();
+        var tiempoSinActividad = horaActual - req.session.hora;
+
+        if (tiempoSinActividad > 120000)
+        {
+            delete req.session.user;
+        }
+        else
+        {
+            req.session.hora = horaActual;
+        }
+
+    }
+    next();
+});   
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
